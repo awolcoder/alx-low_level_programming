@@ -1,103 +1,45 @@
 #include "variadic_functions.h"
+
 /**
  * print_all - prints anything
- *
- * @format: fotmat of printers (ceis)
- *
- * Return: void
+ * @format: format of data type to be printed
  */
 void print_all(const char * const format, ...)
 {
-	/* Create struct type of printers */
-	printers arraychars[] = {
-		{"c", print_char},
-		{"i", print_integer},
-		{"f", print_float},
-		{"s", print_string},
-		{NULL, NULL}
-	};
+	unsigned int i = 0;
+	char *str, *sep = "";
+	va_list arguments;
 
-	int index1 = 0;
-	int index2 = 0;
-	char *commaspace = "";
-	va_list charlist;
-
-	/*Initial charlist pointer*/
-	va_start(charlist, format);
-
-	while (format && format[index1] != '\0')
+	va_start(arguments, format);
+	if (format)
 	{
-		index2 = 0;
-		while (index2 < 4)
+		while (format[i])
 		{
-			/* dereferenced to the pointer arguments */
-			if (format[index1] == *arraychars[index2].arguments)
+			switch (format[i])
 			{
-				printf("%s", commaspace);
-				arraychars[index2].print(charlist);
-				commaspace = ", ";
-				break;
+				case 'c':
+					printf("%s%c", sep, va_arg(arguments, int));
+					break;
+				case 'i':
+					printf("%s%i", sep, va_arg(arguments, int));
+					break;
+				case 'f':
+					printf("%s%f", sep, va_arg(arguments, double));
+					break;
+				case 's':
+					str = va_arg(arguments, char *);
+					if (!str)
+						str = "(nil)";
+					printf("%s%s", sep, str);
+					break;
+				default:
+					i++;
+					continue;
 			}
-			index2++;
+			sep = ", ";
+			i++;
 		}
-		index1++;
 	}
 	printf("\n");
-	va_end(charlist);
-}
-
-/**
- * print_char - prints a char
- *
- * @charlist: va_list that iterates through the args
- *
- * Return: void
- */
-void print_char(va_list charlist)
-{
-	printf("%c", va_arg(charlist, int));
-}
-
-/**
- * print_integer - prints an integer
- *
- * @charlist: va_list that iterates through the args
- *
- * Return:void
- */
-void print_integer(va_list charlist)
-{
-	printf("%d", va_arg(charlist, int));
-}
-
-/**
- * print_float - prints a float
- *
- * @charlist: va_list that iterates through the args
- *
- * Return: void
- */
-void print_float(va_list charlist)
-{
-	printf("%f", va_arg(charlist, double));
-}
-
-/**
- * print_string - prints a string
- *
- * @charlist: va_list that iterates through the args
- *
- * Return: void
- */
-void print_string(va_list charlist)
-{
-	char *str;
-
-	/* de-reference str to the arg passed to the function */
-	str = va_arg(charlist, char *);
-
-	if (str == NULL)
-		str = "(nil)";
-
-	printf("%s", str);
+	va_end(arguments);
 }
